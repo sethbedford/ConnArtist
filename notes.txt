@@ -1,0 +1,2 @@
+1. export FLASK_APP=ConnArtist.py
+2. Run "flask run" while in ConnArtist folder
