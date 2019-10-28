@@ -2,3 +2,7 @@
 __pycache__/
 
 flaskVENV/
+
+conntrack_data.json
+
+.vscode/settings.json

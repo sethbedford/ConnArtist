@@ -6,3 +6,10 @@ Start environment:
 
 1. export FLASK_APP=ConnArtist.py
 2. Run "flask run" while in ConnArtist folder
+
+
+
+
+FUTURE STUFF:
+       DONE: Need to address the issue of multiple instances of the same IPs
+       Add port stuff, maybe will make graph look better
