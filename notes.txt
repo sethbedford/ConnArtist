@@ -8,8 +8,16 @@ Start environment:
 2. Run "flask run" while in ConnArtist folder
 
 
-
-
 FUTURE STUFF:
-       DONE: Need to address the issue of multiple instances of the same IPs
-       Add port stuff, maybe will make graph look better
+    DONE: Add previous snapshots
+	Add access to these previous snapshots
+	Add good templates with tabs for live and snapshot modes
+	Edit JS such that ports are used
+	Edit JS such that it is more zoomed in
+	Edit JS such that more information can be gleaned from hovering/clicking on nodes
+		IP
+		Port
+		Reverse DNS
+		Application connecting to this?
+	Edit JS so that we can move nodes better
+	Maybe try to add notes that can be added to nodes (may be too much)

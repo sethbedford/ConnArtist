@@ -1,5 +1,6 @@
 import subprocess
 import json
+import time
 
 def conntrack_parse():
 	p = subprocess.check_output(["conntrack", "-L"])
@@ -134,4 +135,14 @@ def conntrack_parse():
 	with open('app/static/conntrack_data.json', 'w') as outfile:
 		json.dump(json_output, outfile)
 
+	archiveJson(json_output)
 	return string_return
+
+# Copies the json generated from the conntrack data to a archive folder for recall if need be
+def archiveJson(json_output):
+
+	# The timestamp we use is nanoseconds since epoch to avoid overwriting if quick refreshes
+	timeStampedFileName = "conntrackData-" + str(time.time_ns()) + ".json"
+
+	with open('app/static/PrevSnapshots/' + timeStampedFileName, 'w') as outfile:
+		json.dump(json_output, outfile)

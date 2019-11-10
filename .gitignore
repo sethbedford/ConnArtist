@@ -6,3 +6,5 @@ flaskVENV/
 conntrack_data.json
 
 .vscode/settings.json
+
+app/static/PrevSnapshots/
