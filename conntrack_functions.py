@@ -1,8 +1,12 @@
 import subprocess
 import json
 import time
+import socket
 
-def conntrack_parse():
+
+def conntrack_parse(mode):
+	print("MODE: " + mode)
+	
 	p = subprocess.check_output(["conntrack", "-L"])
 	p = str(p)
 	p = p.replace("\\n", "\n")
@@ -29,10 +33,10 @@ def conntrack_parse():
 
 		
 		if split_line[0] == "tcp":
-			print("TCP client src: " + split_line[4].split("=")[1]) # Print SRC client
-			print("TCP client dst: " + split_line[5].split("=")[1]) # Print DST client
-			print("TCP client src: " + split_line[6].split("=")[1]) # Print SPORT client
-			print("TCP client dst: " + split_line[7].split("=")[1]) # Print DPORT client
+			# print("TCP client src: " + split_line[4].split("=")[1]) # Print SRC client
+			# print("TCP client dst: " + split_line[5].split("=")[1]) # Print DST client
+			# print("TCP client src: " + split_line[6].split("=")[1]) # Print SPORT client
+			# print("TCP client dst: " + split_line[7].split("=")[1]) # Print DPORT client
 
 			string_return += "TCP client src: " + split_line[4].split("=")[1] + "<br/>"
 			string_return += "TCP client dst: " + split_line[5].split("=")[1] + "<br/>"
@@ -40,10 +44,10 @@ def conntrack_parse():
 			string_return += "TCP client dst: " + split_line[7].split("=")[1] + "<br/>"
 
 			try:
-				print("TCP server src: " + split_line[8].split("=")[1]) # Print SRC server
-				print("TCP server dst: " + split_line[9].split("=")[1]) # Print DST server
-				print("TCP server src: " + split_line[10].split("=")[1]) # Print SPORT server
-				print("TCP server dst: " + split_line[11].split("=")[1]) # Print DPORT server
+				# print("TCP server src: " + split_line[8].split("=")[1]) # Print SRC server
+				# print("TCP server dst: " + split_line[9].split("=")[1]) # Print DST server
+				# print("TCP server src: " + split_line[10].split("=")[1]) # Print SPORT server
+				# print("TCP server dst: " + split_line[11].split("=")[1]) # Print DPORT server
 
 				string_return += "TCP server src: " + split_line[8].split("=")[1] + "<br/>"
 				string_return += "TCP server dst: " + split_line[9].split("=")[1] + "<br/>"
@@ -51,29 +55,64 @@ def conntrack_parse():
 				string_return += "TCP server dst: " + split_line[11].split("=")[1] + "<br/>"
 			except: 
 				continue
+			
+			mode = str(mode).strip()
+			
+			if ("IP" in mode):
+				if (split_line[4].split("=")[1] not in IP_dict):
+					json_output["nodes"].append(
+					{"id":split_line[4].split("=")[1], 
+					"group":0,})
+					IP_dict[split_line[4].split("=")[1]] = 1;
 
-			if (split_line[4].split("=")[1] not in IP_dict):
-				json_output["nodes"].append(
-		 		{"id":split_line[4].split("=")[1], 
-		 		"group":0})
-				IP_dict[split_line[4].split("=")[1]] = 1;
+				if (split_line[5].split("=")[1] not in IP_dict):
+					json_output["nodes"].append(
+					{"id":split_line[5].split("=")[1], 
+					"group":1})
+					IP_dict[split_line[5].split("=")[1]] = 1;
+			
+				json_output["links"].append(
+				{"source":split_line[4].split("=")[1], 
+				"target":split_line[5].split("=")[1], 
+				"value":1})	
+			
+			elif ("PORT" in mode):
+				destinationURL = ""
+				try:
+					destinationURL = socket.gethostbyaddr(split_line[5].split("=")[1])[0]
+				except:
+					destinationURL = "Unknown"
 
-			if (split_line[5].split("=")[1] not in IP_dict):
-				json_output["nodes"].append(
-		 		{"id":split_line[5].split("=")[1], 
-		 		"group":1})
-				IP_dict[split_line[5].split("=")[1]] = 1;
+				if (split_line[6].split("=")[1] not in IP_dict):
+					json_output["nodes"].append(
+					{"id":split_line[6].split("=")[1], 
+					"group":0,
+					"SourceIP":split_line[4].split("=")[1],
+					"DestinationIP":split_line[5].split("=")[1],
+					"DestinationURL":destinationURL})
+					IP_dict[split_line[6].split("=")[1]] = 1;
 
-			json_output["links"].append(
-			{"source":split_line[4].split("=")[1], 
-			"target":split_line[5].split("=")[1], 
-			"value":1})			
+				if (split_line[7].split("=")[1] not in IP_dict):
+					json_output["nodes"].append(
+					{"id":split_line[7].split("=")[1], 
+					"group":1,
+					"SourceIP":split_line[4].split("=")[1],
+					"DestinationIP":split_line[5].split("=")[1],
+					"DestinationURL":destinationURL})
+					IP_dict[split_line[7].split("=")[1]] = 1;
+
+				json_output["links"].append(
+				{"source":split_line[6].split("=")[1], 
+				"target":split_line[7].split("=")[1], 
+				"value":1})		
+
+					
 
 		elif split_line[0] == "udp":
-			print("UDP client src: " + split_line[3].split("=")[1]) # Print SRC client
-			print("UDP client dst: " + split_line[4].split("=")[1]) # Print DST client
-			print("UDP client src: " + split_line[5].split("=")[1]) # Print SPORT client
-			print("UDP client dst: " + split_line[6].split("=")[1]) # Print DPORT client
+			# print("UDP client src: " + split_line[3].split("=")[1]) # Print SRC client
+			# print("UDP client dst: " + split_line[4].split("=")[1]) # Print DST client
+			# print("UDP client src: " + split_line[5].split("=")[1]) # Print SPORT client
+			# print("UDP client dst: " + split_line[6].split("=")[1]) # Print DPORT client
 
 			string_return += "UDP client src: " + split_line[3].split("=")[1] + "<br/>"
 			string_return += "UDP client dst: " + split_line[4].split("=")[1] + "<br/>"
@@ -82,10 +121,10 @@ def conntrack_parse():
 
 			# Need try/except for weird case where we get MAC values in UDP, no idea what causes it
 			try:
-				print("UDP server src: " + split_line[7].split("=")[1]) # Print SRC server
-				print("UDP server dst: " + split_line[8].split("=")[1]) # Print DST server
-				print("UDP server src: " + split_line[9].split("=")[1]) # Print SPORT server
-				print("UDP server dst: " + split_line[10].split("=")[1]) # Print DPORT server
+				# print("UDP server src: " + split_line[7].split("=")[1]) # Print SRC server
+				# print("UDP server dst: " + split_line[8].split("=")[1]) # Print DST server
+				# print("UDP server src: " + split_line[9].split("=")[1]) # Print SPORT server
+				# print("UDP server dst: " + split_line[10].split("=")[1]) # Print DPORT server
 
 				string_return += "UDP client src: " + split_line[7].split("=")[1] + "<br/>"
 				string_return += "UDP client dst: " + split_line[8].split("=")[1] + "<br/>"
@@ -94,22 +133,55 @@ def conntrack_parse():
 			except:
 				continue
 
-			if (split_line[3].split("=")[1] not in IP_dict):
-				json_output["nodes"].append(
-		 		{"id":split_line[3].split("=")[1], 
-		 		"group":0})
-				IP_dict[split_line[3].split("=")[1]] = 1;
+			mode = str(mode).strip()
 
-			if (split_line[4].split("=")[1] not in IP_dict):
-				json_output["nodes"].append(
-		 		{"id":split_line[4].split("=")[1], 
-		 		"group":1})
-				IP_dict[split_line[4].split("=")[1]] = 1;
+			if("IP" in mode):
+				if (split_line[3].split("=")[1] not in IP_dict):
+					json_output["nodes"].append(
+					{"id":split_line[3].split("=")[1], 
+					"group":0})
+					IP_dict[split_line[3].split("=")[1]] = 1;
 
-			json_output["links"].append(
-			{"source":split_line[3].split("=")[1], 
-			"target":split_line[4].split("=")[1], 
-			"value":2})
+				if (split_line[4].split("=")[1] not in IP_dict):
+					json_output["nodes"].append(
+					{"id":split_line[4].split("=")[1], 
+					"group":1})
+					IP_dict[split_line[4].split("=")[1]] = 1;
+
+				json_output["links"].append(
+				{"source":split_line[3].split("=")[1], 
+				"target":split_line[4].split("=")[1], 
+				"value":2})
+
+			elif("PORT" in mode):
+				destinationURL = ""
+				try:
+					destinationURL = socket.gethostbyaddr(split_line[4].split("=")[1])[0]
+				except:
+					destinationURL = "Unknown"
+
+				if (split_line[5].split("=")[1] not in IP_dict):
+					json_output["nodes"].append(
+					{"id":split_line[5].split("=")[1], 
+					"group":0,
+					"SourceIP":split_line[3].split("=")[1],
+					"DestinationIP":split_line[4].split("=")[1],
+					"DestinationURL":destinationURL})
+					IP_dict[split_line[5].split("=")[1]] = 1;
+
+				if (split_line[6].split("=")[1] not in IP_dict):
+					json_output["nodes"].append(
+					{"id":split_line[6].split("=")[1], 
+					"group":1,
+					"SourceIP": split_line[3].split("=")[1],
+					"DestinationIP": split_line[4].split("=")[1],
+					"DestinationURL":destinationURL})
+					IP_dict[split_line[6].split("=")[1]] = 1;
+
+				json_output["links"].append(
+				{"source":split_line[5].split("=")[1], 
+				"target":split_line[6].split("=")[1], 
+				"value":2})
 		else:
 			continue			
 
@@ -135,14 +207,14 @@ def conntrack_parse():
 	with open('app/static/conntrack_data.json', 'w') as outfile:
 		json.dump(json_output, outfile)
 
-	archiveJson(json_output)
+	archiveJson(json_output, mode)
 	return string_return
 
 # Copies the json generated from the conntrack data to a archive folder for recall if need be
-def archiveJson(json_output):
+def archiveJson(json_output, mode):
 
 	# The timestamp we use is nanoseconds since epoch to avoid overwriting if quick refreshes
-	timeStampedFileName = "conntrackData-" + str(time.time_ns()) + ".json"
+	timeStampedFileName = "conntrackData-" + str(time.time_ns()) + "_" + str(mode) +  ".json"
 
 	with open('app/static/PrevSnapshots/' + timeStampedFileName, 'w') as outfile:
 		json.dump(json_output, outfile)

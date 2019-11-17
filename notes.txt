@@ -10,10 +10,13 @@ Start environment:
 
 FUTURE STUFF:
     DONE: Add previous snapshots
-	Add access to these previous snapshots
+	DONE: Add access to these previous snapshots
 	Add good templates with tabs for live and snapshot modes
 	Edit JS such that ports are used
-	Edit JS such that it is more zoomed in
+        Can add port to json and print on tooltip
+        Also could change fields in JS such that it is IP, SPORT, DPORT...
+            Would need to change to d.IP instead of d.id and other such things
+    Edit JS such that it is more zoomed in
 	Edit JS such that more information can be gleaned from hovering/clicking on nodes
 		IP
 		Port

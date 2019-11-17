@@ -21,7 +21,7 @@ text {
 
 <div id="list">
 
-{{ list|safe }}
+    {{ list|safe }}
 
 </div>
 
@@ -75,7 +75,7 @@ text {
         //	    .attr('y', 3);
     
         node.append("title")
-            .text(function(d) { return d.id; });
+            .text(function(d) { {{ title|safe }} });
     
         simulation
             .nodes(graph.nodes)
