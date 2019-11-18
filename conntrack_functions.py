@@ -214,7 +214,7 @@ def conntrack_parse(mode):
 def archiveJson(json_output, mode):
 
 	# The timestamp we use is nanoseconds since epoch to avoid overwriting if quick refreshes
-	timeStampedFileName = "conntrackData-" + str(time.time_ns()) + "_" + str(mode) +  ".json"
+	timeStampedFileName = "conntrackData-" + str(time.time() * 10000000) + "_" + str(mode) +  ".json"
 
 	with open('app/static/PrevSnapshots/' + timeStampedFileName, 'w') as outfile:
 		json.dump(json_output, outfile)
