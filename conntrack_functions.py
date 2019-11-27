@@ -1,7 +1,8 @@
 import subprocess
 import json
-import time
+import datetime
 import socket
+import os
 
 
 def conntrack_parse(mode):
@@ -171,7 +172,7 @@ def conntrack_parse(mode):
 
 				if (split_line[6].split("=")[1] not in IP_dict):
 					json_output["nodes"].append(
-					{"id":split_line[6].split("=")[1], 
+					{"id":split_line[6].split("=")[1],
 					"group":1,
 					"SourceIP": split_line[3].split("=")[1],
 					"DestinationIP": split_line[4].split("=")[1],
@@ -204,8 +205,12 @@ def conntrack_parse(mode):
 	# 	"target":"REPLACE", 
 	# 	"value":"REPLACE"})
 
-	with open('app/static/conntrack_data.json', 'w') as outfile:
-		json.dump(json_output, outfile)
+        if "PORT" in mode:
+            with open('app/static/conntrack_data_port.json', 'w') as outfile:
+                json.dump(json_output, outfile)
+        else:
+            with open('app/static/conntrack_data.json', 'w') as outfile:
+                json.dump(json_output, outfile)
 
 	archiveJson(json_output, mode)
 	return string_return
@@ -213,8 +218,17 @@ def conntrack_parse(mode):
 # Copies the json generated from the conntrack data to a archive folder for recall if need be
 def archiveJson(json_output, mode):
 
-	# The timestamp we use is nanoseconds since epoch to avoid overwriting if quick refreshes
-	timeStampedFileName = "conntrackData-" + str(time.time() * 10000000) + "_" + str(mode) +  ".json"
-
-	with open('app/static/PrevSnapshots/' + timeStampedFileName, 'w') as outfile:
-		json.dump(json_output, outfile)
+	# Check if output is same as most recent file -- don't output if sort
+    files = os.listdir('/home/seth/conn/ConnArtist-master/app/static/PrevSnapshots')
+    files.sort(reverse=1)
+    if len(files) != 0:
+        prevOutput = open('/home/seth/conn/ConnArtist-master/app/static/PrevSnapshots/' + files[0], "r")
+        prevJSON = prevOutput.read()
+        if(prevJSON != json_output):
+            timeStampedFileName = "conntrackData-" + datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S") + "_" + str(mode) +  ".json"
+            with open('app/static/PrevSnapshots/' + timeStampedFileName, 'w') as outfile:
+                json.dump(json_output, outfile)
+    else:
+        timeStampedFileName = "conntrackData-" + datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S") + "_" + str(mode) +  ".json"
+        with open('app/static/PrevSnapshots/' + timeStampedFileName, 'w') as outfile:
+            json.dump(json_output, outfile)
