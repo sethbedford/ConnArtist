@@ -190,27 +190,27 @@ def conntrack_parse(mode):
 		print()
 		string_return += "<br/>"
 
-	# Generate json that D3 likes
-	# json_output = {}
-	# json_output["nodes"] = []
-	
-	# json_output["nodes"].append(
-	# 	{"id":"REPLACE", 
-	# 	"group":"REPLACE"})
+		# Generate json that D3 likes
+		# json_output = {}
+		# json_output["nodes"] = []
+		
+		# json_output["nodes"].append(
+		# 	{"id":"REPLACE", 
+		# 	"group":"REPLACE"})
 
-	# json_output["links"] = []
-	
-	# json_output["links"].append(
-	# 	{"source":"REPLACE", 
-	# 	"target":"REPLACE", 
-	# 	"value":"REPLACE"})
+		# json_output["links"] = []
+		
+		# json_output["links"].append(
+		# 	{"source":"REPLACE", 
+		# 	"target":"REPLACE", 
+		# 	"value":"REPLACE"})
 
-        if "PORT" in mode:
-            with open('app/static/conntrack_data_port.json', 'w') as outfile:
-                json.dump(json_output, outfile)
-        else:
-            with open('app/static/conntrack_data.json', 'w') as outfile:
-                json.dump(json_output, outfile)
+	if "PORT" in mode:
+		with open('app/static/conntrack_data_port.json', 'w') as outfile:
+			json.dump(json_output, outfile)
+	else:
+		with open('app/static/conntrack_data.json', 'w') as outfile:
+			json.dump(json_output, outfile)			
 
 	archiveJson(json_output, mode)
 	return string_return
@@ -219,10 +219,10 @@ def conntrack_parse(mode):
 def archiveJson(json_output, mode):
 
 	# Check if output is same as most recent file -- don't output if sort
-    files = os.listdir('/home/seth/conn/ConnArtist-master/app/static/PrevSnapshots')
+    files = os.listdir('app/static/PrevSnapshots')
     files.sort(reverse=1)
     if len(files) != 0:
-        prevOutput = open('/home/seth/conn/ConnArtist-master/app/static/PrevSnapshots/' + files[0], "r")
+        prevOutput = open('app/static/PrevSnapshots/' + files[0], "r")
         prevJSON = prevOutput.read()
         if(prevJSON != json_output):
             timeStampedFileName = "conntrackData-" + datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S") + "_" + str(mode) +  ".json"
