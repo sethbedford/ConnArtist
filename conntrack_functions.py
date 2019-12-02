@@ -71,11 +71,24 @@ def conntrack_parse(mode):
 					{"id":split_line[5].split("=")[1], 
 					"group":1})
 					IP_dict[split_line[5].split("=")[1]] = 1;
+
+				linkExists = False
+				for link in json_output["links"]:
+					if link["source"] == split_line[3].split("=")[1] and link["target"] == split_line[4].split("=")[1]:
+						link["weight"] = link["weight"] + 1
+						linkExists = True;
+
+				if linkExists == False:
+					json_output["links"].append(
+					{"source":split_line[3].split("=")[1], 
+					"target":split_line[4].split("=")[1], 
+					"value":2,
+					"weight":1})
 			
-				json_output["links"].append(
-				{"source":split_line[4].split("=")[1], 
-				"target":split_line[5].split("=")[1], 
-				"value":1})	
+				#json_output["links"].append(
+				#{"source":split_line[4].split("=")[1], 
+				#"target":split_line[5].split("=")[1], 
+				#"value":1})	
 			
 			elif ("PORT" in mode):
 				destinationURL = ""
@@ -92,6 +105,10 @@ def conntrack_parse(mode):
 					"DestinationIP":split_line[5].split("=")[1],
 					"DestinationURL":destinationURL})
 					IP_dict[split_line[6].split("=")[1]] = 1;
+				else:
+					for node in json_output["nodes"]:
+						if node["id"] == split_line[6].split("=")[1] and node["group"] == 1:
+							node["group"] = 2;
 
 				if (split_line[7].split("=")[1] not in IP_dict):
 					json_output["nodes"].append(
@@ -101,11 +118,28 @@ def conntrack_parse(mode):
 					"DestinationIP":split_line[5].split("=")[1],
 					"DestinationURL":destinationURL})
 					IP_dict[split_line[7].split("=")[1]] = 1;
+				else:
+					for node in json_output["nodes"]:
+						if node["id"] == split_line[6].split("=")[1] and node["group"] == 1:
+							node["group"] = 2;
 
-				json_output["links"].append(
-				{"source":split_line[6].split("=")[1], 
-				"target":split_line[7].split("=")[1], 
-				"value":1})		
+				linkExists = False
+				for link in json_output["links"]:
+					if link["source"] == split_line[6].split("=")[1] and link["target"] == split_line[7].split("=")[1]:
+						link["weight"] = link["weight"] + 1
+						linkExists = True;
+
+				if linkExists == False:
+					json_output["links"].append(
+					{"source":split_line[6].split("=")[1], 
+					"target":split_line[7].split("=")[1], 
+					"value":2,
+					"weight":1})
+
+				#json_output["links"].append(
+				#{"source":split_line[6].split("=")[1], 
+				#"target":split_line[7].split("=")[1], 
+				#"value":1})		
 
 					
 
@@ -149,10 +183,18 @@ def conntrack_parse(mode):
 					"group":1})
 					IP_dict[split_line[4].split("=")[1]] = 1;
 
-				json_output["links"].append(
-				{"source":split_line[3].split("=")[1], 
-				"target":split_line[4].split("=")[1], 
-				"value":2})
+				linkExists = False
+				for link in json_output["links"]:
+					if link["source"] == split_line[3].split("=")[1] and link["target"] == split_line[4].split("=")[1]:
+						link["weight"] = link["weight"] + 1
+						linkExists = True;
+
+				if linkExists == False:
+					json_output["links"].append(
+					{"source":split_line[3].split("=")[1], 
+					"target":split_line[4].split("=")[1], 
+					"value":1,
+					"weight":1})
 
 			elif("PORT" in mode):
 				destinationURL = ""
@@ -169,6 +211,10 @@ def conntrack_parse(mode):
 					"DestinationIP":split_line[4].split("=")[1],
 					"DestinationURL":destinationURL})
 					IP_dict[split_line[5].split("=")[1]] = 1;
+				else:
+					for node in json_output["nodes"]:
+						if node["id"] == split_line[6].split("=")[1] and node["group"] == 1:
+							node["group"] = 2;
 
 				if (split_line[6].split("=")[1] not in IP_dict):
 					json_output["nodes"].append(
@@ -178,16 +224,32 @@ def conntrack_parse(mode):
 					"DestinationIP": split_line[4].split("=")[1],
 					"DestinationURL":destinationURL})
 					IP_dict[split_line[6].split("=")[1]] = 1;
+				else:
+					for node in json_output["nodes"]:
+						if node["id"] == split_line[6].split("=")[1] and node["group"] == 1:
+							node["group"] = 2;
+				
+				linkExists = False
+				for link in json_output["links"]:
+					if link["source"] == split_line[5].split("=")[1] and link["target"] == split_line[6].split("=")[1]:
+						link["weight"] = link["weight"] + 1
+						linkExists = True;
 
-				json_output["links"].append(
-				{"source":split_line[5].split("=")[1], 
-				"target":split_line[6].split("=")[1], 
-				"value":2})
+				if linkExists == False:
+					json_output["links"].append(
+					{"source":split_line[5].split("=")[1], 
+					"target":split_line[6].split("=")[1], 
+					"value":1,
+					"weight":1})
+
+				#json_output["links"].append(
+				#{"source":split_line[5].split("=")[1], 
+				#"target":split_line[6].split("=")[1], 
+				#"value":2,
+				#"weight":1})
 		else:
 			continue			
 
-
-		print()
 		string_return += "<br/>"
 
 		# Generate json that D3 likes
