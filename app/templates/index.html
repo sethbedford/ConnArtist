@@ -1,30 +1,40 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
     <script type="text/javascript">
         var refresh = true;
         function toggleRefresh() {
-            if(refresh)
+            if(refresh) {
                 refresh = false;
-            else
+                $("#toggle").text("Unpause");
+            } else {
                 refresh = true;
+                $("#toggle").text("Pause");
+            }
         }
+        drawGraph();
 
         setInterval(function(){
+            drawGraph();
+        }, 8000);
+
+        function drawGraph() {
             if(refresh) {
                 $.ajax({
-                    url: "/",
+                    url: window.location.href,
                     type: 'GET',
                     success: function(res) {
-                        console.log(res);
+                        console.log("Success");
                     }
                 });
-                d3.select('svg').selectAll('*').remove();
 
+                d3.select('svg').selectAll('*').remove();
+                /*
                 var simulation = d3.forceSimulation()
                 .force("link", d3.forceLink().id(function(d) { return d.id; }))
-                .force("charge", d3.forceManyBody().strength(-10))
+                .force("charge", d3.forceManyBody().strength(-5))
                 .force("center", d3.forceCenter(width / 2, height / 2));
 
                 d3.json("{{ variable }}", function(error, graph) {
@@ -80,21 +90,179 @@
                             .attr("transform", function(d) {
                             return "translate(" + d.x + "," + d.y + ")";
                             })
+                            .attr("cx", function(d) {
+                                return d.x = Math.max(radius, Math.min(width - radius, d.x));
+                            })
+                            .attr("cy", function(d) {
+                                return d.y = Math.max(radius, Math.min(height - radius, d.y));
+                            })
+                    }
+                });
+                */
+                d3.json("{{ variable }}", function(error, graph) {
+                    if (error) throw error;
+
+                    var elementSelector = '.graph',
+                            svgSelector = '#svg-graph',
+                            width = 960,
+                            height = 600, isDragging;
+
+                    var lScale = d3.scale.pow().exponent(5)
+                                .range([3, 15])
+                                .domain(d3.extent(graph.links, function(d) {
+                                    return d.value; }));
+                                    
+                    var zoomBeh = d3.behavior.zoom()
+                                .scaleExtent([0.1, 10])
+                                .on("zoom", zoomEvent);
+                    var svgParent = d3.select(svgSelector)
+                                .attr("width", width)
+                                .attr("height", height);
+                    var svg = svgParent
+                                .call(zoomBeh)
+                                .append("g");
+
+                    var edges = [];
+                    graph.links.forEach(function(e) { 
+                        var sourceNode = graph.nodes.filter(function(n) { return n.id === e.source; })[0],
+                        targetNode = graph.nodes.filter(function(n) { return n.id === e.target; })[0];
+                        edges.push({source: sourceNode, target: targetNode, value: e.value});
+                    });
+
+                    var force = d3.layout.force()
+                                .charge(-60)
+                                .linkDistance(function(d) { return lScale(d.value); })
+                                .size([width, height])
+                                .nodes(graph.nodes)
+                                .links(edges)
+                                .on('start', forceStart)
+                                .start();
+
+                    var link = svg.selectAll(".link")
+                                .data(edges)
+                                .enter().append("line")
+                                .attr("class", function(d,i) {
+                                    if(d.value == 1)
+                                        return "tcp";
+                                    return "udp";
+                                });
+
+                    var drag = force.drag()
+                                .on("dragstart", function(d){
+                                    isDragging = true;
+                                    d3.event.sourceEvent.stopPropagation();
+                                })
+                                .on("dragend", function(d) {
+                                    isDragging = false;
+                                });
+
+                    var node = svg.selectAll(".node")
+                                .data(graph.nodes)
+                                .enter().append("circle")
+                                .attr("class", function(d,i) { 
+                                    if(d.group == 1)
+                                        return "node source";
+                                    return "node dest";
+                                })
+                                .attr("r", function(d){ return 3;})
+                                .style("fill", function(d) {
+                                    if(d.group == 1)
+                                        return "#1F77B4";
+                                    return "#AEC7E8";
+                                })
+                                .call(drag);
+                    /*
+                    var node = svg.selectAll(".pubdata")
+                            .data(graph.nodes)
+                            .enter()
+                            .append("g")
+                            .attr("transform", function(d) {
+                                return "translate(" + d.x + ","+ d.y + ")";
+                            });
+
+                    node.append("circle")
+                        .attr("r", function(d) { return 5; })
+                        .attr("class", function(d,i) { return "node pubdata"; })
+                        .call(drag);
+
+                    node.append("text")
+                        .text(function(d) { return d.id; });
+                    */
+
+                    /*var lables = elem.append("text")
+                       .text(function(d) {
+                         return d.id;
+                       })
+                       .attr('x', 6)
+                            .attr('y', 3);*/
+
+                    node.append("title")
+                        .text(function(d) { {{ title|safe }} });
+
+                    function forceStart() {
+                        var ticksPerRender = 3;
+                        requestAnimationFrame(function render() {
+                        for (var i=0; i<ticksPerRender; i++)
+                          force.tick();
+                        link.attr("x1", function(d) { return d.source.x; })
+                          .attr("y1", function(d) { return d.source.y; })
+                          .attr("x2", function(d) { return d.target.x; })
+                          .attr("y2", function(d) { return d.target.y; });
+                        node.attr("cx", function(d) { return d.x; })
+                          .attr("cy", function(d) { return d.y; });
+                        if (force.alpha() > 0) {
+                          requestAnimationFrame(render);
+                        }
+                        zoomFit(undefined, 0);
+                      });
+                    }
+
+                    function zoomEvent() {
+                        node
+                        .attr("r", function(d) { return 5 / d3.event.scale; })
+                        .style("stroke-width", function(d) {
+                            return 2 / d3.event.scale;});
+                      link.style('stroke-width', 1 / d3.event.scale);
+                      svg.attr("transform",
+                                "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+                    }
+
+                    function zoomFit(paddingPercent, transitionDuration) {
+                        var bounds = svg.node().getBBox();
+                        var parent = svg.node().parentElement;
+                        var fullWidth = parent.clientWidth || parent.parentNode.clientWidth,
+                            fullHeight = parent.clientHeight || parent.parentNode.clientHeight;
+                        var zwidth = bounds.width,
+                            zheight = bounds.height;
+                        var midX = bounds.x + zwidth / 2,
+                            midY = bounds.y + zheight / 2;
+                        if (zwidth == 0 || zheight == 0) return; // nothing to fit
+                        var scale = (paddingPercent || 0.95) / Math.max(zwidth / fullWidth, zheight / fullHeight);
+                        var translate = [fullWidth / 2 - scale * midX, fullHeight / 2 - scale * midY];
+
+                        //console.trace("zoomFit", translate, scale);
+                        svg
+                            .transition()
+                            .duration(transitionDuration || 0) // milliseconds
+                            .call(zoomBeh.translate(translate).scale(scale).event);
                     }
                 });
             }
-        }, 8000);
+        }
     </script>
     <style>
 
-    .links line {
-      stroke: #999;
-      stroke-opacity: 0.6;
+    line {
+      stroke-opacity: 0.8;
+      stroke-width: 5px;
     }
 
-    .nodes circle {
-      stroke: #fff;
-      stroke-width: 1.5px;
+    line.tcp {
+        stroke: red;
+    }
+
+    line.udp {
+        stroke: green;
     }
 
     text {
@@ -115,23 +283,26 @@
     </style>
 </head>
 
-<div id="graph">
+<div class="graph" id="graph">
     LIVE NETWORK GRAPH<br>
     Mode: <b>{{ mode }}</b><br>
     Switch Mode: <a href="/">IP</a> | <a href="/port">PORT</a><br>
-    <svg width="960" height="600"></svg>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+    Live Updates: <a id="toggle" href="javascript:toggleRefresh();">Pause</a><br>
+    <svg id="svg-graph" width="960" height="600"></svg>
+    <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
     <script type="text/javascript">
-    
+        /*
         var svg = d3.select("svg"),
             width = +svg.attr("width"),
-            height = +svg.attr("height");
+            height = +svg.attr("height"),
+            radius = 3;
     
         var color = d3.scaleOrdinal(d3.schemeCategory20);
     
+        
         var simulation = d3.forceSimulation()
             .force("link", d3.forceLink().id(function(d) { return d.id; }))
-            .force("charge", d3.forceManyBody().strength(-10))
+            .force("charge", d3.forceManyBody().strength(-5))
             .force("center", d3.forceCenter(width / 2, height / 2));
     
         d3.json("{{ variable }}", function(error, graph) {
@@ -147,6 +318,7 @@
     
         var node = svg.append("g")
             .attr("class", "nodes")
+            .attr("r", radius - .75)
             .selectAll("g")
             .data(graph.nodes)
             .enter().append("g")
@@ -164,7 +336,7 @@
              return d.id;
            })
            .attr('x', 6)
-        	    .attr('y', 3);
+                .attr('y', 3);
     
         node.append("title")
             .text(function(d) { {{ title|safe }} });
@@ -207,6 +379,7 @@
         d.fy = null;
         }
 
+        */
 
     
     </script>
