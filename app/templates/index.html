@@ -145,7 +145,7 @@
                             .enter().append("line")
                             .attr("class", function(d,i) {
                                 if(d.value == 1)
-                                    return "tcp" + " weight_" + Math.min(d.weight);
+                                    return "tcp" + " weight_" + Math.min(5, d.weight);
                                 return "udp" + " weight_" + Math.min(5, d.weight);
                             });
 
