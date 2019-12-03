@@ -198,11 +198,18 @@
                                     .attr("data-trigger", function(d) {
                                         return "focus";
                                     })
+                                    .attr("data-html", function(d) {
+                                        return "true";
+                                    })
                                     .attr("title", function(d) {
                                         return "Details for " + d.id;
                                     })
                                     .attr("data-content", function(d) {
-                                        return "To be filled";
+                                        var output = "";
+                                        for(var i = 0; i < d.srcIPs.length; i++) {
+                                            output += d.srcIPs[i] + " → " + d.dstIPs[i] + "<br>";
+                                        }
+                                        return output;
                                     })
                                     .call(drag);
                                     

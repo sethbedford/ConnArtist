@@ -103,12 +103,17 @@ def conntrack_parse(mode):
 					"group":0,
 					"SourceIP":split_line[4].split("=")[1],
 					"DestinationIP":split_line[5].split("=")[1],
-					"DestinationURL":destinationURL})
+					"DestinationURL":destinationURL,
+					"srcIPs": [split_line[4].split("=")[1]],
+					"dstIPs": [split_line[5].split("=")[1]]})
 					IP_dict[split_line[6].split("=")[1]] = 1;
 				else:
 					for node in json_output["nodes"]:
-						if node["id"] == split_line[6].split("=")[1] and node["group"] == 1:
-							node["group"] = 2;
+						if node["id"] == split_line[6].split("=")[1]:
+							if node["group"] == 1:
+								node["group"] = 2;
+							node["srcIPs"].append(split_line[4].split("=")[1])
+							node["dstIPs"].append(split_line[5].split("=")[1])
 
 				if (split_line[7].split("=")[1] not in IP_dict):
 					json_output["nodes"].append(
@@ -116,12 +121,17 @@ def conntrack_parse(mode):
 					"group":1,
 					"SourceIP":split_line[4].split("=")[1],
 					"DestinationIP":split_line[5].split("=")[1],
-					"DestinationURL":destinationURL})
+					"DestinationURL":destinationURL,
+					"srcIPs": [split_line[5].split("=")[1]],
+					"dstIPs": [split_line[4].split("=")[1]]})
 					IP_dict[split_line[7].split("=")[1]] = 1;
 				else:
 					for node in json_output["nodes"]:
-						if node["id"] == split_line[7].split("=")[1] and node["group"] == 0:
-							node["group"] = 2;
+						if node["id"] == split_line[7].split("=")[1]:
+							if node["group"] == 0:
+								node["group"] = 2;
+							node["srcIPs"].append(split_line[5].split("=")[1])
+							node["dstIPs"].append(split_line[4].split("=")[1])
 
 				linkExists = False
 				for link in json_output["links"]:
@@ -209,12 +219,17 @@ def conntrack_parse(mode):
 					"group":0,
 					"SourceIP":split_line[3].split("=")[1],
 					"DestinationIP":split_line[4].split("=")[1],
-					"DestinationURL":destinationURL})
+					"DestinationURL":destinationURL,
+					"srcIPs": [split_line[3].split("=")[1]],
+					"dstIPs": [split_line[4].split("=")[1]]})
 					IP_dict[split_line[5].split("=")[1]] = 1;
 				else:
 					for node in json_output["nodes"]:
-						if node["id"] == split_line[5].split("=")[1] and node["group"] == 1:
-							node["group"] = 2;
+						if node["id"] == split_line[5].split("=")[1]:
+							if node["group"] == 1:
+								node["group"] = 2;
+							node["srcIPs"].append(split_line[3].split("=")[1])
+							node["dstIPs"].append(split_line[4].split("=")[1])
 
 				if (split_line[6].split("=")[1] not in IP_dict):
 					json_output["nodes"].append(
@@ -222,12 +237,17 @@ def conntrack_parse(mode):
 					"group":1,
 					"SourceIP": split_line[3].split("=")[1],
 					"DestinationIP": split_line[4].split("=")[1],
-					"DestinationURL":destinationURL})
+					"DestinationURL":destinationURL,
+					"srcIPs": [split_line[4].split("=")[1]],
+					"dstIPs": [split_line[3].split("=")[1]]})
 					IP_dict[split_line[6].split("=")[1]] = 1;
 				else:
 					for node in json_output["nodes"]:
-						if node["id"] == split_line[6].split("=")[1] and node["group"] == 0:
-							node["group"] = 2;
+						if node["id"] == split_line[6].split("=")[1]:
+							if node["group"] == 0:
+								node["group"] = 2;
+							node["srcIPs"].append(split_line[4].split("=")[1])
+							node["dstIPs"].append(split_line[3].split("=")[1])
 				
 				linkExists = False
 				for link in json_output["links"]:
