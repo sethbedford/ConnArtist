@@ -74,14 +74,14 @@ def conntrack_parse(mode):
 
 				linkExists = False
 				for link in json_output["links"]:
-					if link["source"] == split_line[3].split("=")[1] and link["target"] == split_line[4].split("=")[1]:
+					if link["source"] == split_line[4].split("=")[1] and link["target"] == split_line[5].split("=")[1]:
 						link["weight"] = link["weight"] + 1
 						linkExists = True;
 
 				if linkExists == False:
 					json_output["links"].append(
-					{"source":split_line[3].split("=")[1], 
-					"target":split_line[4].split("=")[1], 
+					{"source":split_line[4].split("=")[1], 
+					"target":split_line[5].split("=")[1], 
 					"value":2,
 					"weight":1})
 			
