@@ -128,7 +128,7 @@
                 graph.links.forEach(function(e) { 
                     var sourceNode = graph.nodes.filter(function(n) { return n.id === e.source; })[0],
                     targetNode = graph.nodes.filter(function(n) { return n.id === e.target; })[0];
-                    edges.push({source: sourceNode, target: targetNode, value: e.value});
+                    edges.push({source: sourceNode, target: targetNode, value: e.value, weight: e.weight});
                 });
 
                 var force = d3.layout.force()
@@ -145,8 +145,8 @@
                             .enter().append("line")
                             .attr("class", function(d,i) {
                                 if(d.value == 1)
-                                    return "tcp";
-                                return "udp";
+                                    return "tcp" + " weight_" + Math.min(d.weight);
+                                return "udp" + " weight_" + Math.min(5, d.weight);
                             });
 
                 var drag = force.drag()
@@ -174,6 +174,9 @@
                                     return "#838181"; // destination node
                                 return "#1F77B4"; // hybrid node
                             })
+                            .attr("onclick", function(d) {
+                                return "javascript:alert('test');";
+                            }) 
                             .call(drag);
                 /*
                 var node = svg.selectAll(".pubdata")
@@ -263,6 +266,26 @@
       stroke-opacity: 0.8;
     }
 
+    line.weight_1 {
+        stroke-width: 0.27px !important;
+    }
+
+    line.weight_2 {
+        stroke-width: 0.5px !important;
+    }
+
+    line.weight_3 {
+        stroke-width: 0.75px !important;
+    }
+
+    line.weight_4 {
+        stroke-width: 1px !important;
+    }
+
+    line.weight_5 {
+        stroke-width: 1.25px !important;
+    }
+
     line.tcp {
         stroke: red;
     }
@@ -325,8 +348,8 @@
         <div class="key_src">SRC</div>
         <div class="key_dst">DST</div>
         <div class="key_hyb">HYB</div><br>
-        Green Edge: UDP<br>
-        Red Edge: TCP<br>
+        Red Edge: UDP<br>
+        Green Edge: TCP<br>
     </div>
     <div id="saves">
         <p>SAVED GRAPHS</p>
