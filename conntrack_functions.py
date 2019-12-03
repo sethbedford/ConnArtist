@@ -120,7 +120,7 @@ def conntrack_parse(mode):
 					IP_dict[split_line[7].split("=")[1]] = 1;
 				else:
 					for node in json_output["nodes"]:
-						if node["id"] == split_line[6].split("=")[1] and node["group"] == 1:
+						if node["id"] == split_line[7].split("=")[1] and node["group"] == 0:
 							node["group"] = 2;
 
 				linkExists = False
@@ -213,7 +213,7 @@ def conntrack_parse(mode):
 					IP_dict[split_line[5].split("=")[1]] = 1;
 				else:
 					for node in json_output["nodes"]:
-						if node["id"] == split_line[6].split("=")[1] and node["group"] == 1:
+						if node["id"] == split_line[5].split("=")[1] and node["group"] == 1:
 							node["group"] = 2;
 
 				if (split_line[6].split("=")[1] not in IP_dict):
@@ -226,7 +226,7 @@ def conntrack_parse(mode):
 					IP_dict[split_line[6].split("=")[1]] = 1;
 				else:
 					for node in json_output["nodes"]:
-						if node["id"] == split_line[6].split("=")[1] and node["group"] == 1:
+						if node["id"] == split_line[6].split("=")[1] and node["group"] == 0:
 							node["group"] = 2;
 				
 				linkExists = False

@@ -168,9 +168,9 @@
                             })
                             .attr("r", function(d){ return 3;})
                             .style("fill", function(d) {
-                                if(d.group == 1)
+                                if(d.group == 0)
                                     return "#AEC7E8"; // source node
-                                else if(d.group == 2)
+                                else if(d.group == 1)
                                     return "#838181"; // destination node
                                 return "#1F77B4"; // hybrid node
                             })
