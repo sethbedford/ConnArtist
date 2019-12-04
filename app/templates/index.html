@@ -7,9 +7,8 @@
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $('[data-toggle="popover"]').popover();
-            $('.popover-dismiss').popover({
-                trigger: 'focus'
+            $('[data-toggle="popover"]').popover({
+                sanitize: false
             });
         });
 
@@ -33,6 +32,23 @@
 
         function hidePopover() {
             $("#ip_link").focus();
+        }
+
+        function exportData(data) {
+            var formData = "data=" + data;
+            $.ajax({
+                url : "/export",
+                type: "POST",
+                data : formData,
+                success: function(data, textStatus, jqXHR)
+                {
+                    alert("Data exported successfully");
+                },
+                error: function (jqXHR, textStatus, errorThrown)
+                {
+                    alert("Data failed to export");
+                }
+            });
         }
 
         function drawGraph() {
@@ -202,7 +218,11 @@
                                         return "true";
                                     })
                                     .attr("title", function(d) {
-                                        return "Details for " + d.id;
+                                        var data = ""
+                                        for(var i = 0; i < d.srcIPs.length; i++) {
+                                            data += d.srcIPs[i] + " --> " + d.srcIPs[i] + "\\n";
+                                        }
+                                        return "Details for " + d.id + " &nbsp;&nbsp;&nbsp;<a class='export' href='javascript:exportData(\"" + data + "\")'>Export</a>";
                                     })
                                     .attr("data-content", function(d) {
                                         var output = "";
@@ -260,6 +280,7 @@
                         }
 
                         function zoomEvent() {
+                            hidePopover();
                             node
                             .attr("r", function(d) { return 5 / d3.event.scale; })
                             .style("stroke-width", function(d) {
@@ -289,9 +310,8 @@
                                 .call(zoomBeh.translate(translate).scale(scale).event);
                         }
 
-                        $('[data-toggle="popover"]').popover();
-                        $('.popover-dismiss').popover({
-                            trigger: 'focus'
+                        $('[data-toggle="popover"]').popover({
+                            sanitize: false
                         });
                         $('circle').mousedown(function(e) {
                             e.stopImmediatePropagation();
@@ -377,6 +397,12 @@
 
     .key_hyb {
         background-color: #838181;
+    }
+
+    .export {
+        font-size: .8rem;
+        float: right;
+        vertical-align: top;
     }
 
     </style>

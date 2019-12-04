@@ -1,8 +1,20 @@
 from app import app
-from flask import render_template, url_for
+from flask import render_template, url_for, request
 import os
 
 from conntrack_functions import *
+
+@app.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    return r
 
 @app.route('/')
 @app.route('/index')
@@ -12,7 +24,7 @@ def index():
 	url = url_for('static', filename='conntrack_data.json')
 
 	links = generateListPrevSnapshots("IP")
-	tooltip = 'return "SourcePort: " + d.id + "\\n" + "SourceIP: " + d.SourceIP + "\\n" + "DestinationIP: " + d.DestinationIP + "\\nDestinationURL: " + d.DestinationURL;'
+	tooltip = 'return "IP: " + d.id'
 
 	return render_template('index.html', variable=url, list=links, title=tooltip, mode="IP")
 
@@ -25,6 +37,15 @@ def index_port():
 	tooltip = 'return "SourcePort: " + d.id + "\\n" + "SourceIP: " + d.SourceIP + "\\n" + "DestinationIP: " + d.DestinationIP + "\\nDestinationURL: " + d.DestinationURL;'
 
 	return render_template('index.html', variable=url, list=links, title=tooltip, mode="PORT")
+
+@app.route('/export', methods=['POST'])
+def export():
+	if request.method == 'POST':
+		data = request.form.get('data')
+		f = open("app/static/exports/test", "w")
+		f.write(data)
+		f.close()
+	return "Success"
 
 @app.route('/snapshot/<fileName>')
 def previousSnapshot(fileName=None):
