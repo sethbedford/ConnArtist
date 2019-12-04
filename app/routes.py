@@ -1,5 +1,6 @@
 from app import app
 from flask import render_template, url_for, request
+import datetime
 import os
 
 from conntrack_functions import *
@@ -34,18 +35,21 @@ def index_port():
 	url = url_for('static', filename='conntrack_data_port.json')
 
 	links = generateListPrevSnapshots("PORT")
-	tooltip = 'return "SourcePort: " + d.id + "\\n" + "SourceIP: " + d.SourceIP + "\\n" + "DestinationIP: " + d.DestinationIP + "\\nDestinationURL: " + d.DestinationURL;'
+	tooltip = 'return "Port: " + d.id'
 
 	return render_template('index.html', variable=url, list=links, title=tooltip, mode="PORT")
 
 @app.route('/export', methods=['POST'])
 def export():
+	mode = request.form.get('mode')
+	node = request.form.get('node')
+	filename = datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S") + "_" + mode + "_" + node + ".data"
 	if request.method == 'POST':
 		data = request.form.get('data')
-		f = open("app/static/exports/test", "w")
+		f = open("app/static/exports/" + filename, "w")
 		f.write(data)
 		f.close()
-	return "Success"
+	return filename
 
 @app.route('/snapshot/<fileName>')
 def previousSnapshot(fileName=None):

@@ -61,10 +61,15 @@ def conntrack_parse(mode):
 			
 			if ("IP" in mode):
 				destinationURL = ""
+				destURL = ""
 				try:
 					destinationURL = socket.gethostbyaddr(split_line[5].split("=")[1])[0]
 				except:
 					destinationURL = "Unknown"
+				try:
+					destURL = socket.gethostbyaddr(split_line[4].split("=")[1])[0]
+				except:
+					destURL = "Unknown"
 				if (split_line[4].split("=")[1] not in IP_dict):
 					json_output["nodes"].append(
 					{"id":split_line[4].split("=")[1], 
@@ -73,8 +78,19 @@ def conntrack_parse(mode):
 					"dstIPs":[split_line[5].split("=")[1]],
 					"srcPORT":[split_line[6].split("=")[1]],
 					"dstPORT":[split_line[7].split("=")[1]],
-					"URLs":[destinationURL]})
+					"URLs":[destinationURL],
+					"URL":destURL})
 					IP_dict[split_line[4].split("=")[1]] = 1;
+				else:
+					for node in json_output["nodes"]:
+						if node["id"] == split_line[4].split("=")[1]:
+							if node["group"] == 1:
+								node["group"] = 2;
+							node["srcIPs"].append(split_line[4].split("=")[1])
+							node["dstIPs"].append(split_line[5].split("=")[1])
+							node["srcPORT"].append(split_line[6].split("=")[1])
+							node["dstPORT"].append(split_line[7].split("=")[1])
+							node["URLs"].append(destinationURL)
 
 				if (split_line[5].split("=")[1] not in IP_dict):
 					json_output["nodes"].append(
@@ -84,8 +100,19 @@ def conntrack_parse(mode):
 					"dstIPs":[split_line[5].split("=")[1]],
 					"srcPORT":[split_line[6].split("=")[1]],
 					"dstPORT":[split_line[7].split("=")[1]],
-					"URLs":[destinationURL]})
+					"URLs":[destinationURL],
+					"URL":destinationURL})
 					IP_dict[split_line[5].split("=")[1]] = 1;
+				else:
+					for node in json_output["nodes"]:
+						if node["id"] == split_line[5].split("=")[1]:
+							if node["group"] == 0:
+								node["group"] = 2;
+							node["srcIPs"].append(split_line[4].split("=")[1])
+							node["dstIPs"].append(split_line[5].split("=")[1])
+							node["srcPORT"].append(split_line[6].split("=")[1])
+							node["dstPORT"].append(split_line[7].split("=")[1])
+							node["URLs"].append(destinationURL)
 
 				linkExists = False
 				for link in json_output["links"]:
@@ -209,10 +236,16 @@ def conntrack_parse(mode):
 
 			if("IP" in mode):
 				destinationURL = ""
+				destURL = ""
 				try:
 					destinationURL = socket.gethostbyaddr(split_line[4].split("=")[1])[0]
 				except:
 					destinationURL = "Unknown"
+				try:
+					destURL = socket.gethostbyaddr(split_line[3].split("=")[1])[0]
+				except:
+					destURL = "Unknown"
+
 				if (split_line[3].split("=")[1] not in IP_dict):
 					json_output["nodes"].append(
 					{"id":split_line[3].split("=")[1], 
@@ -221,8 +254,19 @@ def conntrack_parse(mode):
 					"dstIPs":[split_line[4].split("=")[1]],
 					"srcPORT":[split_line[5].split("=")[1]],
 					"dstPORT":[split_line[6].split("=")[1]],
-					"URLs":[destinationURL]})
+					"URLs":[destinationURL],
+					"URL":destURL})
 					IP_dict[split_line[3].split("=")[1]] = 1;
+				else:
+					for node in json_output["nodes"]:
+						if node["id"] == split_line[3].split("=")[1]:
+							if node["group"] == 1:
+								node["group"] = 2;
+							node["srcIPs"].append(split_line[3].split("=")[1])
+							node["dstIPs"].append(split_line[4].split("=")[1])
+							node["srcPORT"].append(split_line[5].split("=")[1])
+							node["dstPORT"].append(split_line[6].split("=")[1])
+							node["URLs"].append(destinationURL)
 
 				if (split_line[4].split("=")[1] not in IP_dict):
 					json_output["nodes"].append(
@@ -232,8 +276,19 @@ def conntrack_parse(mode):
 					"dstIPs":[split_line[4].split("=")[1]],
 					"srcPORT":[split_line[5].split("=")[1]],
 					"dstPORT":[split_line[6].split("=")[1]],
-					"URLs":[destinationURL]})
+					"URLs":[destinationURL],
+					"URL":destinationURL})
 					IP_dict[split_line[4].split("=")[1]] = 1;
+				else:
+					for node in json_output["nodes"]:
+						if node["id"] == split_line[4].split("=")[1]:
+							if node["group"] == 0:
+								node["group"] = 2;
+							node["srcIPs"].append(split_line[3].split("=")[1])
+							node["dstIPs"].append(split_line[4].split("=")[1])
+							node["srcPORT"].append(split_line[5].split("=")[1])
+							node["dstPORT"].append(split_line[6].split("=")[1])
+							node["URLs"].append(destinationURL)
 
 				linkExists = False
 				for link in json_output["links"]:

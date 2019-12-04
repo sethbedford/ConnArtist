@@ -11,6 +11,9 @@
                 sanitize: false
             });
             $('[rel="tooltip"]').tooltip();
+            $('.toast').toast({
+                delay: 6000
+            });
         });
 
         function toggleRefresh() {
@@ -39,19 +42,24 @@
             $('[rel="tooltip"]').tooltip("hide");
         }
 
-        function exportData(data) {
-            var formData = "data=" + data;
+        function exportData(data, node) {
+            $(".export").blur();
+            var formData = "data=" + data + "&mode={{ mode }}&node=" + node;
             $.ajax({
                 url : "/export",
                 type: "POST",
                 data : formData,
                 success: function(data, textStatus, jqXHR)
                 {
-                    alert("Data exported successfully");
+                    $("#toast-header").html("Data Exported");
+                    $("#toast-body").html("Data exported to: app/static/exports/" + data);
+                    $(".toast").toast('show');
                 },
                 error: function (jqXHR, textStatus, errorThrown)
                 {
-                    alert("Data failed to export");
+                    $("#toast-header").html("Export Failed");
+                    $("#toast-body").html("Data failed to export");
+                    $(".toast").toast('show');
                 }
             });
         }
@@ -153,24 +161,48 @@
                                         return "true";
                                     })
                                     .attr("title", function(d) {
-                                        var data = ""
+                                        var data = d.id + "," + d.group + "," + d.weight + "\\n";
                                         for(var i = 0; i < d.srcIPs.length; i++) {
-                                            data += d.srcIPs[i] + " --> " + d.srcIPs[i] + "\\n";
+                                            data += d.srcIPs[i] + ":" + d.srcPORT[i] + " --> " + d.dstIPs[i] + ":" + d.dstPORT[i] + "\\n";
                                         }
-                                        return "Details for <b>" + d.id + "</b> &nbsp;&nbsp;&nbsp;<a class='export' href='javascript:exportData(\"" + data + "\")'>Export</a>";
+                                        var output = "Details for <b>";
+                                        if("{{ mode }}" == "IP" && d.URL != "Unknown")
+                                            output += "<a href='javascript:hideTooltips();' rel='tooltip' title='" + d.URL + "'>";
+                                        output += d.id;
+                                        if("{{ mode }}" == "IP" && d.URL != "Unknown")
+                                            output += "</a>";
+                                        output += "</b> &nbsp;&nbsp;&nbsp;<a class='export' href='javascript:exportData(\"" + data + "\", \"" + d.id + "\")'>Export</a>";
+
+                                        return output;
                                     })
                                     .attr("data-content", function(d) {
                                         var output = "";
                                         for(var i = 0; i < d.srcIPs.length; i++) {
-                                            output += d.srcIPs[i];
-                                            if(d.srcPORT[i] != d.id)
-                                                output += ":" + d.srcPORT[i];
-                                            if(d.URLs[i] != "Unknown")
-                                                output += " → <a href='javascript:hideTooltips();' rel='tooltip' title='" + d.URLs[i] + "'>" + d.dstIPs[i] + "</a>";
-                                            else
-                                                output += " → " + d.dstIPs[i];
-                                            if(d.dstPORT[i] != d.id)
-                                                output += ":" + d.dstPORT[i];
+                                            var src_match = true, dst_match = true;
+
+                                            if(d.srcIPs[i] != d.id) {
+                                                output += d.srcIPs[i];
+                                                src_match = false;
+                                            }
+
+                                            if(d.srcPORT[i] != d.id) {
+                                                if(!src_match)
+                                                    output += ":";
+                                                output += d.srcPORT[i];
+                                            }
+
+                                            output += " → ";
+
+                                            if(d.dstIPs[i] != d.id) {
+                                                output += "<a href='javascript:hideTooltips();' rel='tooltip' title='" + d.URLs[i] + "'>" + d.dstIPs[i] + "</a>";
+                                                dst_match = false;
+                                            }
+
+                                            if(d.dstPORT[i] != d.id) {
+                                                if(!dst_match)
+                                                    output += ":";
+                                                output += d.dstPORT[i];
+                                            }
                                             output += "<br>";
                                         }
                                         return output;
@@ -328,6 +360,16 @@
         vertical-align: top;
     }
 
+    .popover {
+        max-width: 400px !important;
+    }
+
+    .toast {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+    }
+
     </style>
 </head>
 
@@ -339,6 +381,16 @@
     <span id="refresh"> | <a href="javascript:drawGraph();">Refresh</a></span><br>
     <svg id="svg-graph" width="960" height="600"></svg>
     <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+</div>
+
+<div class="toast">
+    <div class="toast-header">
+        <strong class="mr-auto" id="toast-header"></strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" id="toast-body">
+        
+    </div>
 </div>
 
 <div id="list">
