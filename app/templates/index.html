@@ -10,6 +10,7 @@
             $('[data-toggle="popover"]').popover({
                 sanitize: false
             });
+            $('[rel="tooltip"]').tooltip();
         });
 
         function toggleRefresh() {
@@ -34,6 +35,10 @@
             $("#ip_link").focus();
         }
 
+        function hideTooltips() {
+            $('[rel="tooltip"]').tooltip("hide");
+        }
+
         function exportData(data) {
             var formData = "data=" + data;
             $.ajax({
@@ -52,83 +57,13 @@
         }
 
         function drawGraph() {
+            hideTooltips();
             hidePopover();
             $.ajax({
                 url: window.location.href,
                 type: 'GET',
                 success: function(res) {
-                    console.log("Success");
-                
-
                     d3.select('svg').selectAll('*').remove();
-                    /*
-                    var simulation = d3.forceSimulation()
-                    .force("link", d3.forceLink().id(function(d) { return d.id; }))
-                    .force("charge", d3.forceManyBody().strength(-5))
-                    .force("center", d3.forceCenter(width / 2, height / 2));
-
-                    d3.json("{{ variable }}", function(error, graph) {
-                        if (error) throw error;
-                        console.log(graph);
-
-                        var link = svg.append("g")
-                            .attr("class", "links")
-                            .selectAll("line")
-                            .data(graph.links)
-                            .enter().append("line")
-                            .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
-
-                        var node = svg.append("g")
-                            .attr("class", "nodes")
-                            .selectAll("g")
-                            .data(graph.nodes)
-                            .enter().append("g")
-
-                        var circles = node.append("circle")
-                            .attr("r", 5)
-                            .attr("fill", function(d) { return color(d.group); })
-                            .call(d3.drag()
-                                .on("start", dragstarted)
-                                .on("drag", dragged)
-                                .on("end", dragended));
-
-                        var lables = node.append("text")
-                           .text(function(d) {
-                             return d.id;
-                           })
-                           .attr('x', 6)
-                                .attr('y', 3);
-
-                        node.append("title")
-                            .text(function(d) { {{ title|safe }} });
-
-                        simulation
-                            .nodes(graph.nodes)
-                            .on("tick", ticked);
-
-                        simulation.force("link")
-                            .links(graph.links);
-
-                        function ticked() {
-                            link
-                                .attr("x1", function(d) { return d.source.x; })
-                                .attr("y1", function(d) { return d.source.y; })
-                                .attr("x2", function(d) { return d.target.x; })
-                                .attr("y2", function(d) { return d.target.y; });
-
-                            node
-                                .attr("transform", function(d) {
-                                return "translate(" + d.x + "," + d.y + ")";
-                                })
-                                .attr("cx", function(d) {
-                                    return d.x = Math.max(radius, Math.min(width - radius, d.x));
-                                })
-                                .attr("cy", function(d) {
-                                    return d.y = Math.max(radius, Math.min(height - radius, d.y));
-                                })
-                        }
-                    });
-                    */
                     d3.json("{{ variable }}", function(error, graph) {
                         if (error) throw error;
 
@@ -222,41 +157,25 @@
                                         for(var i = 0; i < d.srcIPs.length; i++) {
                                             data += d.srcIPs[i] + " --> " + d.srcIPs[i] + "\\n";
                                         }
-                                        return "Details for " + d.id + " &nbsp;&nbsp;&nbsp;<a class='export' href='javascript:exportData(\"" + data + "\")'>Export</a>";
+                                        return "Details for <b>" + d.id + "</b> &nbsp;&nbsp;&nbsp;<a class='export' href='javascript:exportData(\"" + data + "\")'>Export</a>";
                                     })
                                     .attr("data-content", function(d) {
                                         var output = "";
                                         for(var i = 0; i < d.srcIPs.length; i++) {
-                                            output += d.srcIPs[i] + " → " + d.dstIPs[i] + "<br>";
+                                            output += d.srcIPs[i];
+                                            if(d.srcPORT[i] != d.id)
+                                                output += ":" + d.srcPORT[i];
+                                            if(d.URLs[i] != "Unknown")
+                                                output += " → <a href='javascript:hideTooltips();' rel='tooltip' title='" + d.URLs[i] + "'>" + d.dstIPs[i] + "</a>";
+                                            else
+                                                output += " → " + d.dstIPs[i];
+                                            if(d.dstPORT[i] != d.id)
+                                                output += ":" + d.dstPORT[i];
+                                            output += "<br>";
                                         }
                                         return output;
                                     })
                                     .call(drag);
-                                    
-                        /*
-                        var node = svg.selectAll(".pubdata")
-                                .data(graph.nodes)
-                                .enter()
-                                .append("g")
-                                .attr("transform", function(d) {
-                                    return "translate(" + d.x + ","+ d.y + ")";
-                                });
-
-                        node.append("circle")
-                            .attr("r", function(d) { return 5; })
-                            .attr("class", function(d,i) { return "node pubdata"; })
-                            .call(drag);
-
-                        node.append("text")
-                            .text(function(d) { return d.id; });
-                        */
-
-                        /*var lables = elem.append("text")
-                           .text(function(d) {
-                             return d.id;
-                           })
-                           .attr('x', 6)
-                                .attr('y', 3);*/
 
                         node.append("title")
                             .text(function(d) { {{ title|safe }} });
@@ -313,12 +232,16 @@
                         $('[data-toggle="popover"]').popover({
                             sanitize: false
                         });
+
+                        $('[rel="tooltip"]').tooltip();
+                        
                         $('circle').mousedown(function(e) {
                             e.stopImmediatePropagation();
                             e.preventDefault(); // prevent focus from firing
                         });
                         $('circle').click(function(e) {
                             $(this).focus();
+                            $('[rel="tooltip"]').tooltip();
                         });
                     });
                 }
