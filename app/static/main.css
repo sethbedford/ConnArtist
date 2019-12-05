@@ -1,0 +1,139 @@
+circle {
+    cursor: pointer;
+    outline: none !important;
+}
+
+line {
+  stroke-opacity: 0.8;
+}
+
+line.weight_1 {
+    stroke-width: 0.27px !important;
+}
+
+line.weight_2 {
+    stroke-width: 0.5px !important;
+}
+
+line.weight_3 {
+    stroke-width: 0.75px !important;
+}
+
+line.weight_4 {
+    stroke-width: 1px !important;
+}
+
+line.weight_5 {
+    stroke-width: 1.25px !important;
+}
+
+line.tcp {
+    stroke: red;
+}
+
+line.udp {
+    stroke: green;
+}
+
+text {
+  font-family: sans-serif;
+  font-size: 10px;
+}
+
+#graph {
+    width: 960px;
+    height: 600px;
+    float: left;
+}
+
+#list {
+    margin-left: 960px;
+}
+
+#refresh, #saveMe {
+    display: none;
+    margin-right: 20px;
+}
+
+.key {
+    width: 50px;
+    height: 100%;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.key_wrapper {
+    width: 100%;
+    text-align: center;
+}
+
+.key.key_udp, .key.key_tcp {
+    height: 5px;
+}
+
+.key_label {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.key_footnote {
+    font-style: italic;
+    font-size: 0.8rem;
+}
+
+div > .key_src {
+    background-color: #AEC7E8;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+}
+
+div > .key_dst {
+    background-color: #1F77B4;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+}
+
+div > .key_hyb {
+    background-color: #A8A6A6;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+}
+
+div > .key_udp {
+    background-color: red;
+    vertical-align: middle;
+    height: 1px;
+    width: 80%;
+    display: inline-block;
+}
+
+div > .key_tcp {
+    background-color: green;
+    vertical-align: middle;
+    height: 1px;
+    width: 80%;
+    display: inline-block;
+}
+
+.export {
+    font-size: .8rem;
+    float: right;
+    vertical-align: top;
+}
+
+.popover {
+    max-width: 400px !important;
+}
+
+.toast {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+}
+
+.navbar-brand {
+    margin-right: 30px;
+}

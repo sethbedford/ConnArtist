@@ -5,18 +5,6 @@ import os
 
 from conntrack_functions import *
 
-@app.after_request
-def add_header(r):
-    """
-    Add headers to both force latest IE rendering engine or Chrome Frame,
-    and also to cache the rendered page for 10 minutes.
-    """
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
-    r.headers['Cache-Control'] = 'public, max-age=0'
-    return r
-
 @app.route('/')
 @app.route('/index')
 @app.route('/ip')
@@ -47,6 +35,24 @@ def export():
 		f.write(data)
 		f.close()
 	return filename
+
+@app.route('/exports')
+def exports():
+	exportFiles = os.listdir("./app/static/exports/")
+	exportFiles.sort(reverse=1)
+	exportFilesOutput = ""
+	for file in exportFiles:
+		exportFilesOutput += "<a href=\"javascript:getExport('" + file + "');\">" + file + "</a><br>"
+	return render_template('export.html', filenames=exportFilesOutput)
+
+@app.route("/getExport")
+def getExport():
+	filename = request.args.get('file')
+	filePath = "./app/static/exports/" + filename
+	f = open(filePath, "r")
+	output = f.read()
+	f.close()
+	return output.replace("\n", "<br>")
 
 @app.route('/save', methods=['POST'])
 def save():

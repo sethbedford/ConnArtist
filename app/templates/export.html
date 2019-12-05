@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <style>
+    </style>
+    <script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">ConnArtist</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item" id="nav_ip">
+            <a class="nav-link" href="/">IP Mode<span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item" id="nav_port">
+            <a class="nav-link" href="/port">PORT Mode</a>
+          </li>
+          <li class="nav-item" id="nav_saves">
+            <a class="nav-link" href="/saves">Saves</a>
+          </li>
+          <li class="nav-item active" id="nav_exports">
+            <a class="nav-link" href="#">Exports</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-xl">
+                EXPORTS
+            </div>
+            <div class="col-xl"></div>
+            <div class="col-xl">
+                CONTENTS
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl" id="export">
+                {{ filenames|safe }}
+            </div>
+            <div class="col-xl" id="contents">
+                
+            </div>
+        </div>
+    </div>
+
+</body>
+<div class="toast">
+    <div class="toast-header">
+        <strong class="mr-auto" id="toast-header"></strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" id="toast-body">
+        
+    </div>
+</div>
