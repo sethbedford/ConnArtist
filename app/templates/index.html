@@ -14,20 +14,36 @@
             $('.toast').toast({
                 delay: 6000
             });
+
+            if("{{ mode }}" == "IP") {
+                $(".nav-item").removeClass("active");
+                $("#nav_ip").addClass("active");
+            } else if("{{ mode }}" == "PORT") {
+                $(".nav-item").removeClass("active");
+                $("#nav_port").addClass("active");
+            } else if("{{ mode }}" == "SAVES") {
+                $(".nav-item").removeClass("active");
+                $("#nav_saves").addClass("active");
+            } else {
+                $(".nav-item").removeClass("active");
+                $("#nav_exports").addClass("active");
+            }
         });
 
         function toggleRefresh() {
             if(refresh) {
                 refresh = false;
                 $("#toggle").text("Unpause");
+                toast("Updates Paused", "The graph will not be updated automatically.");
             } else {
                 refresh = true;
                 $("#toggle").text("Pause");
+                toast("Updates Resumed", "The graph will update with new data every 8 seconds.");
             }
             $("#refresh").toggle();
         }
 
-        drawGraph();
+        drawGraph(false);
 
         setInterval(function(){
             if(refresh)
@@ -39,11 +55,18 @@
         }
 
         function hideTooltips() {
-            $('[rel="tooltip"]').tooltip("hide");
+            $('[rel="tooltip"]').tooltip("hide"); // hide all tooltips
+            $('.url_lookup').blur(); // remove focus from link when clicked
+        }
+
+        function toast(title, content) {
+            $("#toast-header").html(title);
+            $("#toast-body").html(content);
+            $(".toast").toast('show');
         }
 
         function exportData(data, node) {
-            $(".export").blur();
+            $(".export").blur(); // remove focus from link when clicked
             var formData = "data=" + data + "&mode={{ mode }}&node=" + node;
             $.ajax({
                 url : "/export",
@@ -51,20 +74,16 @@
                 data : formData,
                 success: function(data, textStatus, jqXHR)
                 {
-                    $("#toast-header").html("Data Exported");
-                    $("#toast-body").html("Data exported to: app/static/exports/" + data);
-                    $(".toast").toast('show');
+                    toast("Data Exported", "Data exported to: app/static/exports/" + data);
                 },
                 error: function (jqXHR, textStatus, errorThrown)
                 {
-                    $("#toast-header").html("Export Failed");
-                    $("#toast-body").html("Data failed to export");
-                    $(".toast").toast('show');
+                    toast("Export Failed", "Data failed to export");
                 }
             });
         }
 
-        function drawGraph() {
+        function drawGraph(userInit) {
             hideTooltips();
             hidePopover();
             $.ajax({
@@ -143,7 +162,7 @@
                                             return "#AEC7E8"; // source node
                                         else if(d.group == 1)
                                             return "#1F77B4"; // destination node
-                                        return "#838181"; // hybrid node
+                                        return "#A8A6A6"; // hybrid node
                                     })
                                     .attr("tabindex", function(d) {
                                         return 0;
@@ -167,7 +186,7 @@
                                         }
                                         var output = "Details for <b>";
                                         if("{{ mode }}" == "IP" && d.URL != "Unknown")
-                                            output += "<a href='javascript:hideTooltips();' rel='tooltip' title='" + d.URL + "'>";
+                                            output += "<a class='url_lookup' href='javascript:hideTooltips();' rel='tooltip' title='" + d.URL + "'>";
                                         output += d.id;
                                         if("{{ mode }}" == "IP" && d.URL != "Unknown")
                                             output += "</a>";
@@ -275,7 +294,13 @@
                             $(this).focus();
                             $('[rel="tooltip"]').tooltip();
                         });
+
+                        if(userInit)
+                            toast("Graph Refreshed", "New data loaded to graph");
                     });
+                },
+                error: function(data) {
+                    toast("Refresh Failed", "Failed to refresh graph contents");
                 }
             });
         }
@@ -336,6 +361,7 @@
 
     #refresh {
         display: none;
+        margin-right: 20px;
     }
 
     .key > div {
@@ -351,7 +377,7 @@
     }
 
     .key_hyb {
-        background-color: #838181;
+        background-color: #A8A6A6;
     }
 
     .export {
@@ -365,47 +391,76 @@
     }
 
     .toast {
-        position: absolute;
+        position: fixed;
         bottom: 15px;
         right: 15px;
+    }
+
+    .navbar-brand {
+        margin-right: 30px;
     }
 
     </style>
 </head>
 
-<div class="graph" id="graph">
-    LIVE NETWORK GRAPH<br>
-    Mode: <b>{{ mode }}</b><br>
-    Switch Mode: <a id="ip_link" href="/">IP</a> | <a href="/port">PORT</a><br>
-    Live Updates: <a id="toggle" href="javascript:toggleRefresh();">Pause</a>
-    <span id="refresh"> | <a href="javascript:drawGraph();">Refresh</a></span><br>
-    <svg id="svg-graph" width="960" height="600"></svg>
-    <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
-</div>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">ConnArtist</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-<div class="toast">
-    <div class="toast-header">
-        <strong class="mr-auto" id="toast-header"></strong>
-        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body" id="toast-body">
-        
-    </div>
-</div>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item" id="nav_ip">
+            <a class="nav-link" href="/">IP Mode<span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item" id="nav_port">
+            <a class="nav-link" href="/port">PORT Mode</a>
+          </li>
+          <li class="nav-item" id="nav_saves">
+            <a class="nav-link" href="#">Saves</a>
+          </li>
+          <li class="nav-item" id="nav_exports">
+            <a class="nav-link" href="#">Exports</a>
+          </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <button class="btn btn-outline-success my-2 my-sm-0" id="refresh" onclick="javascript:drawGraph(true);" type="button">Refresh</button>
+            <button class="btn btn-outline-success my-2 my-sm-0" id="toggle" onclick="javascript:toggleRefresh();" type="button">Pause Updates</button>
+        </form>
+      </div>
+    </nav>
 
-<div id="list">
-    <div id="key">
-        KEY:
-        <div class="key_src">SRC</div>
-        <div class="key_dst">DST</div>
-        <div class="key_hyb">HYB</div><br>
-        Red Edge: UDP<br>
-        Green Edge: TCP<br>
-        Greater edge weight = More connections<br>
+    <div class="graph" id="graph">
+        <svg id="svg-graph" width="960" height="600"></svg>
+        <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
     </div>
-    <div id="saves">
-        <p>SAVED GRAPHS</p>
 
-        {{ list|safe }}
+    <div class="toast">
+        <div class="toast-header">
+            <strong class="mr-auto" id="toast-header"></strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toast-body">
+            
+        </div>
     </div>
-</div>
+
+    <div id="list">
+        <div id="key">
+            KEY:
+            <div class="key_src">SRC</div>
+            <div class="key_dst">DST</div>
+            <div class="key_hyb">HYB</div><br>
+            Red Edge: UDP<br>
+            Green Edge: TCP<br>
+            Greater edge weight = More connections<br>
+        </div>
+        <div id="saves">
+            <p>SAVED GRAPHS</p>
+
+            {{ list|safe }}
+        </div>
+    </div>
+</body>

@@ -71,8 +71,9 @@ def previousSnapshot(fileName=None):
 def generateListPrevSnapshots(mode):
 	archivedFiles = os.listdir("./app/static/PrevSnapshots/")
 	archivedFiles.sort(reverse=1)
+	filteredFiles = filter(lambda x: mode in x, archivedFiles)
 	links = ""
-	for file in archivedFiles:
+	for file in filteredFiles[:25]:
 		if mode in file:
 			links += "<a href=\"" + "/snapshot/" + file + "\">" + file + "</a>" + "\n"
 			links += "<br>"
