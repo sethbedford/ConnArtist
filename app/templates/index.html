@@ -87,7 +87,7 @@
             hideTooltips();
             hidePopover();
             $.ajax({
-                url: window.location.href,
+                url: "/generate?mode={{ mode }}",
                 type: 'GET',
                 success: function(res) {
                     d3.select('svg').selectAll('*').remove();
@@ -229,7 +229,11 @@
                                     .call(drag);
 
                         node.append("title")
-                            .text(function(d) { {{ title|safe }} });
+                            .text(function(d) { 
+                                if("{{ mode }}" == "IP")
+                                    return "IP: " + d.id;
+                                return "PORT: " + d.id;
+                            });
 
                         function forceStart() {
                             var ticksPerRender = 3;
@@ -295,6 +299,15 @@
                             $('[rel="tooltip"]').tooltip();
                         });
 
+                        $("#save_links").html(function() {
+                            var filenames = JSON.parse(res);
+                            var output = "";
+                            filenames["filenames"].forEach(function(e) {
+                                output += "<a href='/snapshot/" + e + "'>" + e + "</a><br>";
+                            })
+                            return output;
+                        });
+
                         if(userInit)
                             toast("Graph Refreshed", "New data loaded to graph");
                     });
@@ -306,6 +319,10 @@
         }
     </script>
     <style>
+
+    #save_links > a:first-of-type {
+        font-weight: bold;
+    }
 
     circle {
         cursor: pointer;
@@ -552,8 +569,8 @@
         </div>
         <div id="saves">
             <h6>25 MOST RECENT GRAPHS</h6>
-
-            {{ list|safe }}
+            <div id="save_links">
+            </div>
         </div>
     </div>
 </body>

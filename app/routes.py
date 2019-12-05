@@ -21,23 +21,20 @@ def add_header(r):
 @app.route('/index')
 @app.route('/ip')
 def index():
-	conntrack_parse("IP")
 	url = url_for('static', filename='conntrack_data.json')
-
-	links = generateListPrevSnapshots("IP")
-	tooltip = 'return "IP: " + d.id'
-
-	return render_template('index.html', variable=url, list=links, title=tooltip, mode="IP")
+	return render_template('index.html', variable=url, mode="IP")
 
 @app.route('/port')
 def index_port():
-	conntrack_parse("PORT")
 	url = url_for('static', filename='conntrack_data_port.json')
+	return render_template('index.html', variable=url, mode="PORT")
 
-	links = generateListPrevSnapshots("PORT")
-	tooltip = 'return "Port: " + d.id'
-
-	return render_template('index.html', variable=url, list=links, title=tooltip, mode="PORT")
+@app.route('/generate')
+def generate():
+	mode = request.args.get('mode')
+	conntrack_parse(mode)
+	links = generateListPrevSnapshots(mode)
+	return json.dumps(links)
 
 @app.route('/export', methods=['POST'])
 def export():
@@ -71,11 +68,11 @@ def previousSnapshot(fileName=None):
 def generateListPrevSnapshots(mode):
 	archivedFiles = os.listdir("./app/static/PrevSnapshots/")
 	archivedFiles.sort(reverse=1)
-	filteredFiles = filter(lambda x: mode in x, archivedFiles)
-	links = ""
+	filteredFiles = list(filter(lambda x: mode in x, archivedFiles))
+	links = {}
+	links["filenames"] = []
 	for file in filteredFiles[:25]:
 		if mode in file:
-			links += "<a href=\"" + "/snapshot/" + file + "\">" + file + "</a>" + "\n"
-			links += "<br>"
+			links["filenames"].append(file);
 		
 	return links
