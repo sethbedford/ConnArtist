@@ -21,13 +21,11 @@ def add_header(r):
 @app.route('/index')
 @app.route('/ip')
 def index():
-	url = url_for('static', filename='conntrack_data.json')
-	return render_template('index.html', variable=url, mode="IP", view="LIVE")
+	return render_template('index.html', mode="IP", view="LIVE")
 
 @app.route('/port')
 def index_port():
-	url = url_for('static', filename='conntrack_data_port.json')
-	return render_template('index.html', variable=url, mode="PORT", view="LIVE")
+	return render_template('index.html', mode="PORT", view="LIVE")
 
 @app.route('/generate')
 def generate():
@@ -45,10 +43,34 @@ def export():
 	filename = datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S") + "_" + mode + "_" + node + ".data"
 	if request.method == 'POST':
 		data = request.form.get('data')
-		f = open("app/static/exports/" + filename, "w")
+		f = open("app/static/exports/" + filename, "w+")
 		f.write(data)
 		f.close()
 	return filename
+
+@app.route('/save', methods=['POST'])
+def save():
+	filename = request.form.get('filename')
+	filepath = "./app/static/PrevSnapshots/" + filename
+	newFile = "./app/static/saves/" + filename
+	of = open(filepath, "r")
+	fileContents = of.read();
+	of.close()
+	if request.method == 'POST':
+		f = open(newFile, "w+")
+		f.write(fileContents)
+		f.close()
+	return newFile
+
+
+@app.route('/saves')
+def saves():
+	savedFiles = os.listdir("./app/static/saves/")
+	savedFiles.sort(reverse=1)
+	saveFilesOutput = ""
+	for file in savedFiles:
+		saveFilesOutput += "<a href='/snapshot/" + file + "'>" + file[file.index("-")+1:] + "</a><br>"
+	return render_template('save.html', filenames=saveFilesOutput)
 
 @app.route('/snapshot/<fileName>')
 def previousSnapshot(fileName=None):

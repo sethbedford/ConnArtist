@@ -25,7 +25,8 @@
                 $(".nav-item").removeClass("active");
                 $("#nav_saves").addClass("active");
                 $("button").hide();
-                $("form").html("<span class='saveName'>{{ variable }}</span>");
+                $("#savePath").html("{{ variable }}");
+                $("#saveMe").show();
                 refresh = false;
             } else {
                 $(".nav-item").removeClass("active");
@@ -44,6 +45,36 @@
                 toast("Updates Resumed", "The graph will update with new data every 8 seconds.");
             }
             $("#refresh").toggle();
+            $("#saveMe").toggle();
+        }
+
+        function saveGraph() {
+            $.ajax({
+                url: "/generate?mode={{ mode }}&view=SAVE",
+                type: "GET",
+                success: function(data) {
+                    var output = "";
+                    if("{{ view }}" == "LIVE")
+                        output = JSON.parse(data)["filenames"][0];
+                    else
+                        output = "{{ variable }}".split("/")[3];
+                    var formData = "filename=" + output;
+                    $.ajax({
+                        url: "/save",
+                        type: "POST",
+                        data: formData,
+                        success: function(data) {
+                            toast("Graph Saved", "Graph has been saved successfully to " + data);
+                        },
+                        error: function(data) {
+                            toast("Save Error", "Failed to export graph data. Could not save.");
+                        }
+                    });
+                },
+                error: function(data) {
+                    toast("Save Error", "Failed to retrieve graph data. Could not save.");
+                }
+            });
         }
 
         drawGraph(false);
@@ -93,8 +124,26 @@
                 url: "/generate?mode={{ mode }}&view={{ view }}",
                 type: 'GET',
                 success: function(res) {
+                    var filenames = JSON.parse(res);
+                    var current = "";
+                    if("{{ view }}" == "LIVE")
+                        current = "/static/PrevSnapshots/" + filenames["filenames"][0];
+                    else
+                        current = "{{ variable }}";  
+                    $("#save_links").html(function() {
+                        var output = "";
+
+                        filenames["filenames"].forEach(function(e, i) {
+                            if(current.indexOf(e) != -1)
+                                output += "<b><a href='/snapshot/" + e + "'>" + e + "</a></b><br>";
+                            else
+                                output += "<a href='/snapshot/" + e + "'>" + e + "</a><br>";
+                        })
+                        return output;
+                    });
+
                     d3.select('svg').selectAll('*').remove();
-                    d3.json("{{ variable }}", function(error, graph) {
+                    d3.json(current, function(error, graph) {
                         if (error) throw error;
 
                         var elementSelector = '.graph',
@@ -302,20 +351,6 @@
                             $('[rel="tooltip"]').tooltip();
                         });
 
-                        $("#save_links").html(function() {
-                            var filenames = JSON.parse(res);
-                            var output = "";
-                            var current = "{{ variable }}";
-
-                            filenames["filenames"].forEach(function(e, i) {
-                                if(((current == "conntrack_data.json" || current == "conntrack_data_port.json") && i == 0) || current.indexOf(e) != -1)
-                                    output += "<b><a href='/snapshot/" + e + "'>" + e + "</a></b><br>";
-                                else
-                                    output += "<a href='/snapshot/" + e + "'>" + e + "</a><br>";
-                            })
-                            return output;
-                        });
-
                         if(userInit)
                             toast("Graph Refreshed", "New data loaded to graph");
                     });
@@ -380,7 +415,7 @@
         margin-left: 960px;
     }
 
-    #refresh {
+    #refresh, #saveMe {
         display: none;
         margin-right: 20px;
     }
@@ -487,14 +522,16 @@
             <a class="nav-link" href="/port">PORT Mode</a>
           </li>
           <li class="nav-item" id="nav_saves">
-            <a class="nav-link" href="#">Saves</a>
+            <a class="nav-link" href="/saves">Saves</a>
           </li>
           <li class="nav-item" id="nav_exports">
             <a class="nav-link" href="#">Exports</a>
           </li>
         </ul>
         <form class="form-inline my-2 my-lg-0">
+            <span id="savePath" class="saveName" style="margin-right: 20px;"></span>
             <button class="btn btn-outline-success my-2 my-sm-0" id="refresh" onclick="javascript:drawGraph(true);" type="button">Refresh</button>
+            <button class="btn btn-outline-success my-2 my-sm-0" id="saveMe" onclick="javascript:saveGraph();" type="button">Save</button>
             <button class="btn btn-outline-success my-2 my-sm-0" id="toggle" onclick="javascript:toggleRefresh();" type="button">Pause Updates</button>
         </form>
       </div>
