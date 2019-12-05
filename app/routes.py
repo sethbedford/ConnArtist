@@ -22,17 +22,19 @@ def add_header(r):
 @app.route('/ip')
 def index():
 	url = url_for('static', filename='conntrack_data.json')
-	return render_template('index.html', variable=url, mode="IP")
+	return render_template('index.html', variable=url, mode="IP", view="LIVE")
 
 @app.route('/port')
 def index_port():
 	url = url_for('static', filename='conntrack_data_port.json')
-	return render_template('index.html', variable=url, mode="PORT")
+	return render_template('index.html', variable=url, mode="PORT", view="LIVE")
 
 @app.route('/generate')
 def generate():
 	mode = request.args.get('mode')
-	conntrack_parse(mode)
+	view = request.args.get('view')
+	if "LIVE" in view:
+		conntrack_parse(mode)
 	links = generateListPrevSnapshots(mode)
 	return json.dumps(links)
 
@@ -60,10 +62,7 @@ def previousSnapshot(fileName=None):
 	    m = "IP"
 	else:
 	    m = "PORT"
-	links = generateListPrevSnapshots(m)
-	tooltip = 'return "SourcePort: " + d.id + "\\n" + "SourceIP: " + d.SourceIP + "\\n" + "DestinationIP: " + d.DestinationIP + "\\nDestinationURL: " + d.DestinationURL;'
-
-	return render_template('save.html', variable=url, list=links, title=tooltip, mode=m.lower())
+	return render_template('index.html', variable=url, mode=m, view="SAVE")
 
 def generateListPrevSnapshots(mode):
 	archivedFiles = os.listdir("./app/static/PrevSnapshots/")
@@ -71,6 +70,8 @@ def generateListPrevSnapshots(mode):
 	filteredFiles = list(filter(lambda x: mode in x, archivedFiles))
 	links = {}
 	links["filenames"] = []
+	for file in filteredFiles[25:]:
+		os.remove("./app/static/PrevSnapshots/" + file)
 	for file in filteredFiles[:25]:
 		if mode in file:
 			links["filenames"].append(file);
