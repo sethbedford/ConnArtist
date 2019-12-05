@@ -4,8 +4,9 @@ Create virtual environment using script:
 Start environment:
       source flaskVENV/bin/activate
 
-1. export FLASK_APP=ConnArtist.py
-2. Run "flask run" while in ConnArtist folder
+1. ``sudo iptables -A INPUT -j ACCEPT -i lo; sudo iptables -A OUTPUT -j ACCEPT -o lo; sudo iptables -A INPUT -j ACCEPT -m conntrack --ctstate ESTABLISHED,RELATED; sudo iptables -A OUTPUT -j ACCEPT -m conntrack --ctstate ESTABLISHED,RELATED``
+2. export FLASK_APP=ConnArtist.py
+3. Run "flask run" while in ConnArtist folder
 
 
 FUTURE STUFF:
