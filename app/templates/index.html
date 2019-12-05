@@ -364,20 +364,67 @@
         margin-right: 20px;
     }
 
-    .key > div {
+    .key {
         width: 50px;
+        height: 100%;
+        display: table-cell;
+        vertical-align: middle;
     }
 
-    .key_src {
+    .key_wrapper {
+        width: 100%;
+        text-align: center;
+    }
+
+    .key.key_udp, .key.key_tcp {
+        height: 5px;
+    }
+
+    .key_label {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+    .key_footnote {
+        font-style: italic;
+        font-size: 0.8rem;
+    }
+
+    div > .key_src {
         background-color: #AEC7E8;
+        width: 10px;
+        height: 10px;
+        display: inline-block;
     }
 
-    .key_dst {
+    div > .key_dst {
         background-color: #1F77B4;
+        width: 10px;
+        height: 10px;
+        display: inline-block;
     }
 
-    .key_hyb {
+    div > .key_hyb {
         background-color: #A8A6A6;
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+    }
+
+    div > .key_udp {
+        background-color: red;
+        vertical-align: middle;
+        height: 1px;
+        width: 80%;
+        display: inline-block;
+    }
+
+    div > .key_tcp {
+        background-color: green;
+        vertical-align: middle;
+        height: 1px;
+        width: 80%;
+        display: inline-block;
     }
 
     .export {
@@ -449,16 +496,62 @@
 
     <div id="list">
         <div id="key">
-            KEY:
-            <div class="key_src">SRC</div>
-            <div class="key_dst">DST</div>
-            <div class="key_hyb">HYB</div><br>
-            Red Edge: UDP<br>
-            Green Edge: TCP<br>
-            Greater edge weight = More connections<br>
+            <h6>KEY:</h6>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="key">
+                                <div class="key_wrapper">
+                                    <div class="key_src rounded-circle"></div>
+                                </div>
+                            </div>
+                            <div class="key_label">Source</div>
+                        </td>
+                        <td>
+                            <div class="key">
+                                <div class="key_wrapper">
+                                    <div class="key_udp"></div>
+                                </div>
+                            </div>
+                            <div class="key_label">UDP*</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="key">
+                                <div class="key_wrapper">
+                                    <div class="key_dst rounded-circle"></div>
+                                </div>
+                            </div>
+                            <div class="key_label">Destination</div>
+                        </td>
+                        <td>
+                            <div class="key">
+                                <div class="key_wrapper">
+                                    <div class="key_tcp"></div>
+                                </div>
+                            </div>
+                            <div class="key_label">TCP*</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="key">
+                                <div class="key_wrapper">
+                                    <div class="key_hyb rounded-circle"></div>
+                                </div>
+                            </div>
+                            <div class="key_label">Hybrid</div>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <span class="key_footnote">*Greater edge weight = More connections</span><br>
         </div>
         <div id="saves">
-            <p>SAVED GRAPHS</p>
+            <h6>25 MOST RECENT GRAPHS</h6>
 
             {{ list|safe }}
         </div>
