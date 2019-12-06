@@ -137,3 +137,7 @@ div > .key_tcp {
 .navbar-brand {
     margin-right: 30px;
 }
+
+#ip_link {
+    outline: none;
+}

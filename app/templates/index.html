@@ -10,6 +10,8 @@
     <script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
     <script type="text/javascript">
+        var refresh = true;
+        var pendingDraw = false;
         $(document).ready(function() {
             $('[data-toggle="popover"]').popover({
                 sanitize: false
@@ -42,7 +44,8 @@
 
         setInterval(function(){
             if(refresh)
-                drawGraph(false, '{{ view }}', '{{ variable }}', '{{ mode }}');
+                if(!pendingDraw)
+                    drawGraph(false, '{{ view }}', '{{ variable }}', '{{ mode }}');
         }, 8000);
     </script>
 </head>
@@ -57,7 +60,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item" id="nav_ip">
-            <a class="nav-link" href="/">IP Mode<span class="sr-only">(current)</span></a>
+            <a id="ip_link" class="nav-link" href="/">IP Mode<span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item" id="nav_port">
             <a class="nav-link" href="/port">PORT Mode</a>

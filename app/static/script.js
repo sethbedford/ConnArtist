@@ -6,7 +6,7 @@ function toggleRefresh() {
     } else {
         refresh = true;
         $("#toggle").text("Pause");
-        toast("Updates Resumed", "The graph will update with new data every 8 seconds.");
+        toast("Updates Resumed", "Every 8 seconds we will check to see if the previous graph has finished drawing. If so, we will pull a new one for you automatically.");
     }
     $("#refresh").toggle();
     $("#saveMe").toggle();
@@ -42,7 +42,7 @@ function saveGraph(mode, view, variable) {
 }
 
 function hidePopover() {
-    $("#ip_link").focus();
+    $('#ip_link').focus();
 }
 
 function hideTooltips() {
@@ -75,6 +75,7 @@ function exportData(data, node, mode) {
 }
 
 function drawGraph(userInit, view, variable, mode) {
+    pendingDraw = true;
     hideTooltips();
     hidePopover();
     $.ajax({
@@ -313,6 +314,7 @@ function drawGraph(userInit, view, variable, mode) {
 
                 if(userInit)
                     toast("Graph Refreshed", "New data loaded to graph");
+                pendingDraw = false;
             });
         },
         error: function(data) {
