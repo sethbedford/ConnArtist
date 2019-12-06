@@ -4,7 +4,7 @@ A browser-based [conntrack](http://conntrack-tools.netfilter.org/) visualization
 
 Utilizes [Flask](https://www.palletsprojects.com/p/flask/), on the back-end, and [D3](https://d3js.org/) on the front-end in order to parse conntrack data and generate a force-directed graph of connections.
 
-![ConnArtist](https://raw.githubusercontent.com/Eric-Rogers/ConnArtist/master/images/ConnArtist.png)
+![ConnArtist](https://raw.githubusercontent.com/sethbedford/ConnArtist/master/images/ConnArtist.png)
 
 Features
 -------
@@ -25,7 +25,7 @@ Features
 Installation
 ============
 First clone the repository:
-``git clone https://github.com/Eric-Rogers/ConnArtist``
+``git clone https://github.com/sethbedford/ConnArtist``
 
 Install the conntrack, python (2), venv, and virtualenv packages:
 ``sudo apt install -y conntrack && sudo apt install -y python && sudo apt install -y python3-venv && sudo apt install -y virtualenv``
