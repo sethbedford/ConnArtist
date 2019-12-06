@@ -1,5 +1,25 @@
 ConnArtist
 ============
+A browser-based [conntrack](http://conntrack-tools.netfilter.org/) visualization tool. 
+
+Utilizes [Flask](https://www.palletsprojects.com/p/flask/), on the back-end, and [D3](https://d3js.org/) on the front-end in order to parse conntrack data and generate a force-directed graph of connections.
+
+![ConnArtist](https://github.com/Eric-Rogers/ConnArtist/images/ConnArtist.png)
+
+Features
+-------
+
+..* Color coded node types and edges
+
+..* Auto-updating graph
+
+⋅⋅* IP-based connection graph
+
+..* Port-based connection graph
+
+..* Ability to save and recall snapshots
+
+..* Ability to export data in a human readable format
 
 
 Installation
