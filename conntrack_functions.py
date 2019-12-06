@@ -16,8 +16,8 @@ def conntrack_parse(mode):
 
 	p = p.split("\n")
 
-	for line in p:
-		print(line)
+	# for line in p:
+	# 	print(line)
 
 	string_return = ""
 
@@ -55,6 +55,7 @@ def conntrack_parse(mode):
 				string_return += "TCP server src: " + split_line[10].split("=")[1] + "<br/>"
 				string_return += "TCP server dst: " + split_line[11].split("=")[1] + "<br/>"
 			except: 
+				print(line)
 				continue
 			
 			mode = str(mode).strip()
@@ -63,13 +64,16 @@ def conntrack_parse(mode):
 				destinationURL = ""
 				destURL = ""
 				try:
-					destinationURL = socket.gethostbyaddr(split_line[5].split("=")[1])[0]
+					destinationURL = "Unknown"
+					#destinationURL = socket.gethostbyaddr(split_line[5].split("=")[1])[0]
 				except:
 					destinationURL = "Unknown"
 				try:
-					destURL = socket.gethostbyaddr(split_line[4].split("=")[1])[0]
+					destinationURL = "Unknown"
+					#destURL = socket.gethostbyaddr(split_line[4].split("=")[1])[0]
 				except:
 					destURL = "Unknown"
+
 				if (split_line[4].split("=")[1] not in IP_dict):
 					json_output["nodes"].append(
 					{"id":split_line[4].split("=")[1], 
@@ -135,7 +139,8 @@ def conntrack_parse(mode):
 			elif ("PORT" in mode):
 				destinationURL = ""
 				try:
-					destinationURL = socket.gethostbyaddr(split_line[5].split("=")[1])[0]
+					destinationURL = "Unknown"
+					#destinationURL = socket.gethostbyaddr(split_line[5].split("=")[1])[0]
 				except:
 					destinationURL = "Unknown"
 
@@ -230,7 +235,10 @@ def conntrack_parse(mode):
 				string_return += "UDP client src: " + split_line[9].split("=")[1] + "<br/>"
 				string_return += "UDP client dst: " + split_line[10].split("=")[1] + "<br/>"
 			except:
+				print(line)
 				continue
+				
+
 
 			mode = str(mode).strip()
 
@@ -238,11 +246,13 @@ def conntrack_parse(mode):
 				destinationURL = ""
 				destURL = ""
 				try:
-					destinationURL = socket.gethostbyaddr(split_line[4].split("=")[1])[0]
+					destinationURL = "Unknown"
+					#destinationURL = socket.gethostbyaddr(split_line[4].split("=")[1])[0]
 				except:
 					destinationURL = "Unknown"
 				try:
-					destURL = socket.gethostbyaddr(split_line[3].split("=")[1])[0]
+					destinationURL = "Unknown"
+					#destURL = socket.gethostbyaddr(split_line[3].split("=")[1])[0]
 				except:
 					destURL = "Unknown"
 
@@ -306,7 +316,8 @@ def conntrack_parse(mode):
 			elif("PORT" in mode):
 				destinationURL = ""
 				try:
-					destinationURL = socket.gethostbyaddr(split_line[4].split("=")[1])[0]
+					destinationURL = "Unknown"
+					#destinationURL = socket.gethostbyaddr(split_line[4].split("=")[1])[0]
 				except:
 					destinationURL = "Unknown"
 

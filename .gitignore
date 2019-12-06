@@ -8,3 +8,7 @@ conntrack_data.json
 .vscode/settings.json
 
 app/static/PrevSnapshots/
+
+app/static/conntrack_data_port.json
+
+app/static/connartist_data_port.json
